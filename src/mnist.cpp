@@ -23,12 +23,11 @@ uint8_t mnist::from_ifstream_read_8(std::ifstream& ifs)
 
 std::string mnist::image_to_str(const mnist::image& img)
 {
-    return std::accumulate(img.begin(), img.end(), std::string(), [](const std::string& acc, const auto& row)
+    return std::accumulate(img.begin(), img.end(), std::string(), [i=0](const std::string& acc, const auto& entry) mutable
     {
-        return acc + std::accumulate(row.begin(), row.end(), std::string(), [](const std::string& acc_row, const auto& col)
-        {
-            return acc_row + (col ? " X" : " .");
-        }) + "\n";
+        return acc
+            + (entry ? " X" : " .")
+            + (++i % MNIST_IMG_SIZE == 0 ? "\n" : "");
     });
 }
 
@@ -76,13 +75,9 @@ mnist::data mnist::read_data_from_files(const std::string& imgs_file, const std:
         const mnist::image img = [&imgs_ifs]()
         {
             mnist::image temp{};
-            std::transform(temp.begin(), temp.end(), temp.begin(), [&imgs_ifs](auto& row)
+            std::for_each(temp.begin(), temp.end(), [&imgs_ifs](auto& pxl)
             {
-                std::generate(row.begin(), row.end(), [&imgs_ifs]()
-                {
-                    return mnist::from_ifstream_read_8(imgs_ifs);
-                });
-                return row;
+                pxl = mnist::from_ifstream_read_8(imgs_ifs);
             });
             return temp;
         }();

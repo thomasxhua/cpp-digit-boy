@@ -10,10 +10,11 @@ namespace mnist
 {
 
 #define MNIST_IMG_SIZE 28
+#define MNIST_OUT_SIZE 10
 
 using label = uint8_t;
 using pixel = uint8_t;
-using image = std::array<std::array<mnist::pixel, MNIST_IMG_SIZE>, MNIST_IMG_SIZE>;
+using image = std::array<mnist::pixel, MNIST_IMG_SIZE*MNIST_IMG_SIZE>;
 
 using entry = std::pair<mnist::label, mnist::image>;
 using data  = std::vector<mnist::entry>;
