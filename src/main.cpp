@@ -1,9 +1,9 @@
 #include "mnist.h"
 
 #define IMGS_60K "res/train-images-idx3-ubyte"
-#define LBLS_60K "res/train-labels-idx3-ubyte"
+#define LBLS_60K "res/train-labels-idx1-ubyte"
 #define IMGS_10K "res/t10k-images-idx3-ubyte"
-#define LBLS_10K "res/t10k-labels-idx3-ubyte"
+#define LBLS_10K "res/t10k-labels-idx1-ubyte"
 
 int main()
 {
