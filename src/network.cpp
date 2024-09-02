@@ -1,30 +1,51 @@
 #include "network.h"
 
+#include <algorithm>
+#include <random>
+
 #include "tdev.h"
 
 void network::init_weights_and_biases()
 {
-    for (auto it=sizes.begin(); it!=sizes.end(); ++it)
+    std::transform(std::next(sizes.begin()), sizes.end(),
+        std::back_inserter(biases),
+        [](const size_t layer_size)
     {
-        if (it != sizes.begin())
-        {
-            biases.push_back(matrix(*it, std::vector<double>(1, 0)));
-        }
-        const auto next_it = std::next(it);
-        if (next_it != sizes.end())
-        {
-            weights.push_back(matrix(*it, std::vector<double>(*next_it, 0)));
-        }
-    }
+        return matrix(1, layer_size);
+    });
+    std::transform(sizes.begin(), std::prev(sizes.end()), std::next(sizes.begin()),
+        std::back_inserter(weights),
+        [](const size_t first_size, const size_t second_size)
+    {
+        return matrix(first_size, second_size);
+    });
 }
 
 network::network(const std::vector<size_t>& _sizes)
     : sizes(_sizes)
 {
     init_weights_and_biases();
-    //for (const auto& m : weights)
-    //    DELOG(m.size() << ", " << m[0].size());
-    //for (const auto& m : biases)
-    //    DELOG(m.size() << ", " << m[0].size());
+}
+
+matrix network::feedforward(const mnist::image& img) const
+{
+    // layer 1 (TODO make image into matrix)
+    size_t layer_num = 0;
+    const matrix layer_1 = [this, &layer_num, &img]()
+    {
+        matrix temp(1, sizes[layer_num++]);
+        std::transform(img.begin(), img.end(), temp.data.begin(), [](const mnist::pixel p)
+        {
+            return static_cast<double>(p);
+        });
+        return temp;
+    }();
+    // layer 2
+    size_t weights_num = 0;
+    size_t biases_num = 0;
+    const matrix layer_2 = layer_1.dot(weights[weights_num++]) + biases[biases_num++];
+    // layer 3
+    const matrix layer_3 = layer_2.dot(weights[weights_num++]) + biases[biases_num++];
+    return layer_3;
 }
 

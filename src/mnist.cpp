@@ -6,6 +6,7 @@
 #include <bit>
 #include <algorithm>
 #include <numeric>
+#include <stdexcept>
 
 uint32_t mnist::from_ifstream_read_32(std::ifstream& ifs)
 {
@@ -55,7 +56,7 @@ mnist::data mnist::read_data_from_files(const std::string& imgs_file, const std:
     if (!lbls_ifs.is_open())
     {
         ERROR("Cannot open \'" << lbls_file << "\'!");
-        return {};
+        throw std::runtime_error("");
     }
     const uint32_t lbls_magic_num = mnist::from_ifstream_read_32(lbls_ifs);
     const uint32_t lbls_num_items = mnist::from_ifstream_read_32(lbls_ifs);
@@ -67,7 +68,7 @@ mnist::data mnist::read_data_from_files(const std::string& imgs_file, const std:
         || lbls_num_items != imgs_num_items)
     {
         ERROR("Something went wrong!");
-        return {};
+        throw std::runtime_error("");
     }
     for (uint32_t i=0; i<imgs_num_items; ++i)
     {

@@ -2,10 +2,9 @@
 #define NETWORK_H
 
 #include <vector>
-#include <cstdint>
-#include <tuple>
 
-using matrix = std::vector<std::vector<double>>;
+#include "mnist.h"
+#include "matrix.h"
 
 class network
 {
@@ -18,6 +17,8 @@ private:
 
 public:
     network(const std::vector<size_t>& _sizes);
+    
+    matrix feedforward(const mnist::image& img) const;
 };
 
 #endif
