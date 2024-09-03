@@ -22,7 +22,7 @@ uint8_t mnist::from_ifstream_read_8(std::ifstream& ifs)
     return std::byteswap(word);
 }
 
-std::string mnist::image_to_str(const mnist::image& img)
+std::string mnist::image_to_string(const mnist::image& img)
 {
     return std::accumulate(img.begin(), img.end(), std::string(), [i=0](const std::string& acc, const auto& entry) mutable
     {
@@ -30,6 +30,12 @@ std::string mnist::image_to_str(const mnist::image& img)
             + (entry ? " X" : " .")
             + (++i % MNIST_IMG_SIZE == 0 ? "\n" : "");
     });
+}
+
+std::ostream& operator<<(std::ostream& target, const mnist::image& img)
+{
+    target << mnist::image_to_string(img);
+    return target;
 }
 
 // https://yann.lecun.com/exdb/mnist/

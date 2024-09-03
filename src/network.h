@@ -21,5 +21,8 @@ public:
     matrix feedforward(const mnist::image& img) const;
 };
 
+double sigmoid(const double z);
+matrix sigmoid(const matrix& mat);
+
 #endif
 

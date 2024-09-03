@@ -22,7 +22,8 @@ using data  = std::vector<mnist::entry>;
 uint32_t from_ifstream_read_32(std::ifstream& ifs);
 uint8_t from_ifstream_read_8(std::ifstream& ifs);
 
-std::string image_to_str(const mnist::image& img);
+std::string image_to_string(const mnist::image& img);
+std::ostream& operator<<(std::ostream& target, const mnist::image& img);
 
 mnist::data read_data_from_files(const std::string& imgs_file, const std::string& lbls_file);
 

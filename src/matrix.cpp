@@ -2,6 +2,9 @@
 
 #include <stdexcept>
 #include <algorithm>
+#include <random>
+#include <sstream>
+#include <iomanip>
 
 #include "tdev.h"
 
@@ -17,7 +20,7 @@ matrix matrix::dot(const matrix& lhs, const matrix& rhs)
     // primitive implementation
     return [&lhs,&rhs,&lhs_m,&lhs_n,&rhs_n]()
     {
-        matrix temp(lhs_m, rhs_n);
+        matrix temp({lhs_m, rhs_n});
         for (size_t i=0; i<lhs_m; ++i)
             for (size_t j=0; j<rhs_n; ++j)
                 for (size_t k=0; k<lhs_n; ++k)
@@ -26,15 +29,22 @@ matrix matrix::dot(const matrix& lhs, const matrix& rhs)
     }();
 }
 
-matrix::matrix(const size_t _m, const size_t _n)
-    : dim({_m,_n})
-    , data(std::vector<double>(_m*_n, 0.0))
-{}
-
-matrix::matrix(const matrix::shape& _dim)
+matrix::matrix(const matrix::shape& _dim, const bool random_initialized)
     : dim(_dim)
-    , data(std::vector<double>(_dim.first*_dim.second, 0.0))
-{}
+    , data(_dim.first * _dim.second)
+{
+    if (!random_initialized)
+    {
+        std::fill(data.begin(), data.end(), 0.0);
+    }
+    else
+    {
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_real_distribution<> dis(-1.0, 1.0);
+        std::generate(data.begin(), data.end(), [&dis, &gen]() { return dis(gen); });
+    }
+}
 
 matrix::shape matrix::get_dim() const
 {
@@ -56,9 +66,37 @@ matrix matrix::dot(const matrix& rhs) const
     return matrix::dot(*this, rhs);
 }
 
+matrix::index matrix::argmax() const
+{
+    const size_t i = std::distance(data.begin(), std::max_element(data.begin(), data.end()));
+    return
+    {
+        i / dim.second,
+        i % dim.second
+    };
+}
+
+std::string matrix::to_string() const
+{
+    std::ostringstream oss;
+    oss << std::fixed << std::setprecision(2);
+    uint64_t i = 0;
+    std::for_each(data.begin(), data.end(), [this, &oss, &i](const double d)
+    {
+        oss << d << " " << (((i+++1)%dim.second==0) ? "\n" : "");
+    });
+    return oss.str();
+}
+
 std::ostream& operator<<(std::ostream& target, const matrix::shape& dim)
 {
     target << "(" << dim.first << "," << dim.second << ")";
+    return target;
+}
+
+std::ostream& operator<<(std::ostream& target, const matrix& mat)
+{
+    target << mat.to_string();
     return target;
 }
 
