@@ -19,6 +19,7 @@ public:
     network(const std::vector<size_t>& _sizes);
     
     matrix feedforward(const mnist::image& img) const;
+    double test(const mnist::data& data) const;
 };
 
 double sigmoid(const double z);

@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cmath>
 #include <limits>
+#include <numeric>
 
 #include "tdev.h"
 
@@ -48,6 +49,21 @@ matrix network::feedforward(const mnist::image& img) const
     // layer 3
     const matrix layer_3 = sigmoid(layer_2.dot(weights[weights_num++]) + biases[biases_num++]);
     return layer_3;
+}
+
+double network::test(const mnist::data& data) const
+{
+    const size_t correct = std::accumulate(data.begin(), data.end(),
+        0ULL,
+        [this](const size_t acc, const auto& entry)
+    {
+        const auto& lbl = entry.first;
+        const auto& img = entry.second;
+        const auto res  = feedforward(img);
+        const auto ist  = res.argmax().second + 1;
+        return acc + (ist == lbl);
+    });
+    return static_cast<double>(correct) / data.size();
 }
 
 double sigmoid(const double z)
