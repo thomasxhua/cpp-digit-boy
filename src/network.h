@@ -2,6 +2,7 @@
 #define NETWORK_H
 
 #include <vector>
+#include <mutex>
 
 #include "mnist.h"
 #include "matrix.h"
@@ -13,6 +14,7 @@ private:
     std::vector<matrix> weights;
     std::vector<matrix> biases;
 
+    std::once_flag flag_init_weights_and_biases;
     void init_weights_and_biases();
 
 public:

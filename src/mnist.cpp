@@ -50,8 +50,7 @@ mnist::data mnist::read_data_from_files(const std::string& imgs_file, const std:
     std::ifstream imgs_ifs(imgs_file, std::ios::binary);
     if (!imgs_ifs.is_open())
     {
-        ERROR("Cannot open \'" << imgs_file << "\'!");
-        return {};
+        throw std::runtime_error(STR("Cannot open \'" << imgs_file << "\'!"));
     }
     const uint32_t imgs_magic_num = mnist::from_ifstream_read_32(imgs_ifs);
     const uint32_t imgs_num_items = mnist::from_ifstream_read_32(imgs_ifs);
@@ -61,8 +60,7 @@ mnist::data mnist::read_data_from_files(const std::string& imgs_file, const std:
     std::ifstream lbls_ifs(lbls_file, std::ios::binary);
     if (!lbls_ifs.is_open())
     {
-        ERROR("Cannot open \'" << lbls_file << "\'!");
-        throw std::runtime_error("");
+        throw std::runtime_error(STR("Cannot open \'" << lbls_file << "\'!"));
     }
     const uint32_t lbls_magic_num = mnist::from_ifstream_read_32(lbls_ifs);
     const uint32_t lbls_num_items = mnist::from_ifstream_read_32(lbls_ifs);
@@ -73,8 +71,7 @@ mnist::data mnist::read_data_from_files(const std::string& imgs_file, const std:
         || lbls_magic_num != LBLS_MAGIC_NUM
         || lbls_num_items != imgs_num_items)
     {
-        ERROR("Something went wrong!");
-        throw std::runtime_error("");
+        throw std::runtime_error(STR("Something went wrong!"));
     }
     for (uint32_t i=0; i<imgs_num_items; ++i)
     {
@@ -92,3 +89,4 @@ mnist::data mnist::read_data_from_files(const std::string& imgs_file, const std:
     }
     return data;
 }
+

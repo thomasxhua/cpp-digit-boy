@@ -2,6 +2,7 @@
 #define TDEV_H
 
 #include <iostream>
+#include <sstream>
 
 // DEBUG LEVELS
 //
@@ -30,6 +31,14 @@
     #define DEVAR(x) DELOG(#x<<": "<<x)
     #define PAUSE()  std::cin.get()
 #endif
+
+// STRING CREATORS
+#define STR(x) ([&]() -> std::string \
+{ \
+    std::ostringstream oss; \
+    oss << x; \
+    return oss.str(); \
+})()
 
 #endif
 

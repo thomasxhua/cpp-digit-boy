@@ -9,17 +9,20 @@
 
 void network::init_weights_and_biases()
 {
-    std::transform(std::next(sizes.begin()), sizes.end(),
-        std::back_inserter(biases),
-        [](const size_t layer_size)
+    std::call_once(flag_init_weights_and_biases, [this]()
     {
-        return matrix({1, layer_size}, true);
-    });
-    std::transform(sizes.begin(), std::prev(sizes.end()), std::next(sizes.begin()),
-        std::back_inserter(weights),
-        [](const size_t first_size, const size_t second_size)
-    {
-        return matrix({first_size, second_size}, true);
+        std::transform(std::next(sizes.begin()), sizes.end(),
+            std::back_inserter(biases),
+            [](const size_t layer_size)
+        {
+            return matrix({1, layer_size}, true);
+        });
+        std::transform(sizes.begin(), std::prev(sizes.end()), std::next(sizes.begin()),
+            std::back_inserter(weights),
+            [](const size_t first_size, const size_t second_size)
+        {
+            return matrix({first_size, second_size}, true);
+        });
     });
 }
 

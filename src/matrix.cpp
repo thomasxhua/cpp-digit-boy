@@ -14,8 +14,8 @@ matrix matrix::dot(const matrix& lhs, const matrix& rhs)
     const auto [rhs_m,rhs_n] = rhs.get_dim();
     if (lhs_n != rhs_m)
     {
-        ERROR("Dimensions "<<lhs.get_dim()<<" and "<<rhs.get_dim()<<" don't line up for operation \'dot\'!");
-        throw std::runtime_error("");
+        throw std::runtime_error(
+            STR("Dimensions "<<lhs.get_dim()<<" and "<<rhs.get_dim()<<" don't line up for operation \'dot\'!"));
     }
     // primitive implementation
     return [&lhs,&rhs,&lhs_m,&lhs_n,&rhs_n]()
@@ -104,8 +104,8 @@ matrix operator+(const matrix& lhs, const matrix& rhs)
 {
     if (lhs.get_dim() != rhs.get_dim())
     {
-        ERROR("Dimensions "<<lhs.get_dim()<<" and "<<rhs.get_dim()<<" don't line up for operation \'+\'!");
-        throw std::runtime_error("");
+        throw std::runtime_error(
+            STR("Dimensions "<<lhs.get_dim()<<" and "<<rhs.get_dim()<<" don't line up for operation \'+\'!"));
     }
     return [&lhs, &rhs]()
     {
