@@ -6,6 +6,8 @@
 #include <cstdint>
 #include <string>
 
+#include "matrix.h"
+
 namespace mnist
 {
 
@@ -14,7 +16,8 @@ namespace mnist
 
 using label = uint8_t;
 using pixel = uint8_t;
-using image = std::array<mnist::pixel, MNIST_IMG_SIZE*MNIST_IMG_SIZE>;
+using image_raw = std::array<mnist::pixel, MNIST_IMG_SIZE*MNIST_IMG_SIZE>;
+using image = matrix;
 
 using entry = std::pair<mnist::label, mnist::image>;
 using data  = std::vector<mnist::entry>;
@@ -23,7 +26,6 @@ uint32_t from_ifstream_read_32(std::ifstream& ifs);
 uint8_t from_ifstream_read_8(std::ifstream& ifs);
 
 std::string image_to_string(const mnist::image& img);
-std::ostream& operator<<(std::ostream& target, const mnist::image& img);
 
 mnist::data read_data_from_files(const std::string& imgs_file, const std::string& lbls_file);
 

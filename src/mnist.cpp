@@ -24,18 +24,15 @@ uint8_t mnist::from_ifstream_read_8(std::ifstream& ifs)
 
 std::string mnist::image_to_string(const mnist::image& img)
 {
-    return std::accumulate(img.begin(), img.end(), std::string(), [i=0](const std::string& acc, const auto& entry) mutable
+    return std::accumulate(
+        img.data.begin(), img.data.end(),
+        std::string(),
+        [i=0](const std::string& acc, const auto& entry) mutable
     {
         return acc
             + (entry ? " X" : " .")
             + (++i % MNIST_IMG_SIZE == 0 ? "\n" : "");
     });
-}
-
-std::ostream& operator<<(std::ostream& target, const mnist::image& img)
-{
-    target << mnist::image_to_string(img);
-    return target;
 }
 
 // https://yann.lecun.com/exdb/mnist/
@@ -78,12 +75,20 @@ mnist::data mnist::read_data_from_files(const std::string& imgs_file, const std:
         const mnist::label lbl = mnist::from_ifstream_read_8(lbls_ifs);
         const mnist::image img = [&imgs_ifs]()
         {
-            mnist::image temp{};
-            std::for_each(temp.begin(), temp.end(), [&imgs_ifs](auto& pxl)
+            mnist::image_raw raw{};
+            std::for_each(raw.begin(), raw.end(), [&imgs_ifs](auto& pxl)
             {
                 pxl = mnist::from_ifstream_read_8(imgs_ifs);
             });
-            return temp;
+            return [&raw]()
+            {
+                matrix temp({MNIST_IMG_SIZE*MNIST_IMG_SIZE, 1});
+                std::transform(raw.begin(), raw.end(), temp.data.begin(), [](const mnist::pixel p)
+                {
+                    return static_cast<double>(p) / std::numeric_limits<mnist::pixel>::max();
+                });
+                return temp;
+            }();
         }();
         data.push_back({lbl, img});
     }
