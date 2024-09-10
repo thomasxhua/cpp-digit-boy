@@ -4,13 +4,22 @@
 #include <vector>
 #include <iostream>
 #include <string>
+#include <functional>
 
 class matrix
 {
 public:
     using shape = std::pair<size_t,size_t>;
     using index = shape;
+
+    template <typename BinaryOp>
+    static matrix binary_op_element_wise(
+        const matrix& lhs,
+        const matrix& rhs,
+        BinaryOp op,
+        const std::string& op_str);
     static matrix dot(const matrix& lhs, const matrix& rhs);
+    static matrix map(const matrix& mat, const std::function<double(double)>& f);
 
 private:
     const matrix::shape dim;
@@ -35,6 +44,8 @@ std::ostream& operator<<(std::ostream& target, const matrix::shape& dim);
 std::ostream& operator<<(std::ostream& target, const matrix& mat);
 
 matrix operator+(const matrix& lhs, const matrix& rhs);
+matrix operator-(const matrix& lhs, const matrix& rhs);
+matrix operator*(const matrix& lhs, const matrix& rhs);
 
 #endif
 

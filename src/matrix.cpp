@@ -8,6 +8,26 @@
 
 #include "tdev.h"
 
+template <typename BinaryOp>
+matrix matrix::binary_op_element_wise(
+    const matrix& lhs,
+    const matrix& rhs,
+    BinaryOp op,
+    const std::string& op_str)
+{
+    if (lhs.get_dim() != rhs.get_dim())
+    {
+        throw std::runtime_error(
+            STR("Dimensions "<<lhs.get_dim()<<" and "<<rhs.get_dim()<<" don't line up for element-wise operation \'"<<op_str<<"\'!"));
+    }
+    return [&lhs, &rhs, &op]()
+    {
+        matrix temp(rhs.get_dim());
+        std::transform(lhs.data.begin(), lhs.data.end(), rhs.data.begin(), temp.data.begin(), op);
+        return temp;
+    }();
+}
+
 matrix matrix::dot(const matrix& lhs, const matrix& rhs)
 {
     const auto [lhs_m,lhs_n] = lhs.get_dim();
@@ -25,6 +45,21 @@ matrix matrix::dot(const matrix& lhs, const matrix& rhs)
             for (size_t j=0; j<rhs_n; ++j)
                 for (size_t k=0; k<lhs_n; ++k)
                     temp(i,j) += lhs(i,k) * rhs(k,j);
+        return temp;
+    }();
+}
+
+matrix matrix::map(const matrix& mat, const std::function<double(double)>& f)
+{
+    return [&mat, &f]()
+    {
+        matrix temp(mat.get_dim());
+        std::transform(mat.data.begin(), mat.data.end(),
+            temp.data.begin(),
+            [&f](const double z)
+        {
+            return f(z);
+        });
         return temp;
     }();
 }
@@ -102,21 +137,16 @@ std::ostream& operator<<(std::ostream& target, const matrix& mat)
 
 matrix operator+(const matrix& lhs, const matrix& rhs)
 {
-    if (lhs.get_dim() != rhs.get_dim())
-    {
-        throw std::runtime_error(
-            STR("Dimensions "<<lhs.get_dim()<<" and "<<rhs.get_dim()<<" don't line up for operation \'+\'!"));
-    }
-    return [&lhs, &rhs]()
-    {
-        matrix temp(rhs.get_dim());
-        std::transform(lhs.data.begin(), lhs.data.end(), rhs.data.begin(),
-            temp.data.begin(),
-            [](const double lhs_val, const double rhs_val)
-        {
-            return lhs_val+rhs_val;
-        });
-        return temp;
-    }();
+    return matrix::binary_op_element_wise(lhs, rhs, std::plus<>(), "+");
+}
+
+matrix operator-(const matrix& lhs, const matrix& rhs)
+{
+    return matrix::binary_op_element_wise(lhs, rhs, std::minus<>(), "-");
+}
+
+matrix operator*(const matrix& lhs, const matrix& rhs)
+{
+    return matrix::binary_op_element_wise(lhs, rhs, std::multiplies<>(), "*");
 }
 
